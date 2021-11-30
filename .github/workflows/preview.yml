@@ -3,6 +3,9 @@ name: Okteto Flask REST API CI
 on:
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
 
 jobs:
   build:
