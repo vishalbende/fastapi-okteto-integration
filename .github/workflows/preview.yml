@@ -7,44 +7,44 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-  steps:
-      - uses: actions/checkout@v2
-      - name: Install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
+    steps:
+        - uses: actions/checkout@v2
+        - name: Install python
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.9
 
-      - name: Install python dependencies
-        run: pip install -r requirements.txt
+        - name: Install python dependencies
+          run: pip install -r requirements.txt
 
-      - name: Set context to Okteto Cloud
-        uses: okteto/context@latest
-        with:
-          token: ${{ secrets.OKTETO_TOKEN }}
+        - name: Set context to Okteto Cloud
+          uses: okteto/context@latest
+          with:
+            token: ${{ secrets.OKTETO_TOKEN }}
 
-      - name: Deploy your preview environment
-        uses: okteto/deploy-preview@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: staging-${{ github.event.number }}-vishalbende
-          scope: personal
-          timeout: 15m
+        - name: Deploy your preview environment
+          uses: okteto/deploy-preview@latest
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            name: staging-${{ github.event.number }}-vishalbende
+            scope: personal
+            timeout: 15m
 
-      - uses: nev7n/wait_for_response@v1
-        with:
-          url: https://api-staging-${{ github.event.number }}-vishalbende.cloud.okteto.net
-          responseCode: 200
-          timeout: 4000
+        - uses: nev7n/wait_for_response@v1
+          with:
+            url: https://api-staging-${{ github.event.number }}-vishalbende.cloud.okteto.net
+            responseCode: 200
+            timeout: 4000
 
-      - name: Run API tests agaisnt Staging Namespace
-        run: pytest
-        env:
-          STAGING_COUCHDB_URL: https://api-staging-${{ github.event.number }}-vishalbende.cloud.okteto.net
+        - name: Run API tests agaisnt Staging Namespace
+          run: pytest
+          env:
+            STAGING_COUCHDB_URL: https://api-staging-${{ github.event.number }}-vishalbende.cloud.okteto.net
 
-      - name: Build and deploy application container to Okteto Flask Namespace
-        if: ${{ github.event_name == 'push' }}
-        uses: okteto/deploy-stack@master
-        with:
-          name: okteto-flask-app
-          build: true
+        - name: Build and deploy application container to Okteto Flask Namespace
+          if: ${{ github.event_name == 'push' }}
+          uses: okteto/deploy-stack@master
+          with:
+            name: okteto-flask-app
+            build: true
